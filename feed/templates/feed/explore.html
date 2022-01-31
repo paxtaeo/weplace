@@ -4,3 +4,4 @@
     <li><a href="{% url 'feed:user_profile' review.user.username %}">{{ review.user.username }}</a> : <a href="{% url 'feed:place_profile' review.place.id %}">{{ review.place.place_name }}</a></li>
 {% endfor %}
 </ul>
+<a href="{% url "accounts:logout" %}">logout</a>

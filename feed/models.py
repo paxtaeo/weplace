@@ -7,15 +7,15 @@ class Restaurant(models.Model):
     id = models.CharField(primary_key=True, max_length=200)
 
     place_name = models.CharField(max_length=200)
-    place_url = models.CharField(max_length=200)
-    phone = models.CharField(max_length=200)
+    place_url = models.CharField(max_length=200, blank=True)
+    phone = models.CharField(max_length=200, blank=True)
 
-    category_name = models.CharField(max_length=200)
-    category_group_code = models.CharField(max_length=200)
-    category_group_name = models.CharField(max_length=200)
+    category_name = models.CharField(max_length=200, blank=True)
+    category_group_code = models.CharField(max_length=200, blank=True)
+    category_group_name = models.CharField(max_length=200, blank=True)
 
-    address_name = models.CharField(max_length=200)
-    road_address_name = models.CharField(max_length=200)
+    address_name = models.CharField(max_length=200, blank=True)
+    road_address_name = models.CharField(max_length=200, blank=True)
     x = models.CharField(max_length=200)
     y = models.CharField(max_length=200)
 
@@ -24,7 +24,7 @@ class Restaurant(models.Model):
 
 
 class Review(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
 
     rating = models.PositiveSmallIntegerField(validators=[MaxValueValidator(10)])

@@ -1,0 +1,6 @@
+<h1>인기스타</h1>
+<ul>
+{% for celebrity in celebrity_list %}
+    <li><a href="{% url 'feed:user_profile' celebrity.username %}">{{ celebrity.username }}</a></li>
+{% endfor %}
+</ul>

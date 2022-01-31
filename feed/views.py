@@ -10,6 +10,14 @@ from accounts.models import User
 from .models import Place, Review
 
 
+class Index(generic.ListView):
+    template_name = 'feed/index.html'
+    context_object_name = 'celebrity_list'
+
+    def get_queryset(self):
+        return User.objects.all()
+
+
 class UserProfile(generic.DetailView):
     template_name = 'feed/user_profile.html'
     context_object_name = 'profile_owner'

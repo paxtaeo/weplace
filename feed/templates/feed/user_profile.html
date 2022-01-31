@@ -1,0 +1,16 @@
+<h1>{{ profile_owner.username }}</h1>
+
+{% if user == profile_owner %}
+<a href="{% url "feed:review-create" %}">리뷰쓰기</a>
+<a href="{% url "feed:explore" %}">내 친구들 리뷰 보러가기</a>
+{% elif profile_owner in following_list %}
+<a href="{% url "feed:unfollow" profile_owner.username %}">unfollow</a>
+{% else %}
+<a href="{% url "feed:follow" profile_owner.username %}">follow</a>
+{% endif %}
+
+<ul>
+{% for review in review_list %}
+    <li><a href="{% url 'feed:place_profile' review.place.id %}">{{ review.place.place_name }}</a>({{ review.place.address_name }}) : {{ review.comment }}</li>
+{% endfor %}
+</ul>

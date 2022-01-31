@@ -1,0 +1,6 @@
+<h1>{{ place.place_name }}({{ place.address_name }})</h1>
+<ul>
+{% for review in review_list %}
+    <li><a href="{% url 'feed:user_profile' review.user.username %}">{{ review.user.username }}</a> : {{ review.comment }}</li>
+{% endfor %}
+</ul>

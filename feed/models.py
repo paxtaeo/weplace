@@ -1,9 +1,10 @@
 from django.db import models
+from django.urls import reverse
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
-class Restaurant(models.Model):
+class Place(models.Model):
     id = models.CharField(primary_key=True, max_length=200)
 
     place_name = models.CharField(max_length=200)
@@ -25,10 +26,13 @@ class Restaurant(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name='reviews')
 
     rating = models.PositiveSmallIntegerField(validators=[MaxValueValidator(10)])
     comment = models.TextField()
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self):
+        return reverse('feed:user_profile', kwargs={'username': self.user.username})

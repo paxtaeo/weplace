@@ -1,3 +1,4 @@
+from ast import Try
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -82,9 +83,35 @@ def unfollow(request, username):
 
 
 class ReviewCreate(LoginRequiredMixin, generic.edit.CreateView):
+    template_name = 'feed/search.html'
+
     model = Review
-    fields = ['place', 'rating', 'comment']
+    fields = ['rating', 'comment']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['KAKAOMAP_API_KEY'] = settings.KAKAOMAP_API_KEY
+        return context  
 
     def form_valid(self, form):
+        try:
+            place = Place.objects.get(id=self.request.POST['id']) 
+        except:
+            place = Place(
+                id=self.request.POST['id'],
+                place_name=self.request.POST['place_name'],
+                place_url=self.request.POST['place_url'],
+                phone=self.request.POST['phone'],
+                category_name=self.request.POST['category_name'],
+                category_group_name=self.request.POST['category_group_name'],
+                category_group_code=self.request.POST['category_group_code'],
+                address_name=self.request.POST['address_name'],
+                road_address_name=self.request.POST['road_address_name'],
+                x=self.request.POST['x'],
+                y=self.request.POST['y'],
+            )
+            place.save()
+        finally:
+            form.instance.place = place
         form.instance.user = self.request.user
         return super().form_valid(form)

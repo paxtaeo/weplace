@@ -13,5 +13,5 @@ urlpatterns = [
     path('follow/<str:username>/', views.follow, name='follow'),
     path('unfollow/<str:username>/', views.unfollow, name='unfollow'),
 
-    path('reviews/write', views.ReviewCreate.as_view(), name='review-create'),
+    path('reviews/create', views.ReviewCreate.as_view(), name='review-create'),
 ]

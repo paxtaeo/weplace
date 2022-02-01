@@ -12,8 +12,8 @@ class Place(models.Model):
     phone = models.CharField(max_length=200, blank=True)
 
     category_name = models.CharField(max_length=200, blank=True)
-    category_group_code = models.CharField(max_length=200, blank=True)
     category_group_name = models.CharField(max_length=200, blank=True)
+    category_group_code = models.CharField(max_length=200, blank=True)
 
     address_name = models.CharField(max_length=200, blank=True)
     road_address_name = models.CharField(max_length=200, blank=True)
@@ -36,3 +36,8 @@ class Review(models.Model):
 
     def get_absolute_url(self):
         return reverse('feed:user_profile', kwargs={'username': self.user.username})
+
+
+# for field in ['id', 'place_name', 'place_url', 'phone', 'category_name', 'category_group_name', 'category_group_code', 'address_name', 'road_address_name', 'x', 'y']:
+#     print(f"{field}=self.request.POST['{field}']")
+#     print(f'<input id="input_{field}" name="{field}" hidden>')

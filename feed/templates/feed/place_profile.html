@@ -1,6 +1,37 @@
-<h1>{{ place.place_name }}({{ place.address_name }})</h1>
-<ul>
-{% for review in review_list %}
-    <li><a href="{% url 'feed:user_profile' review.user.username %}">{{ review.user.username }}</a> : {{ review.comment }}</li>
-{% endfor %}
-</ul>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        {% include 'feed/place_card.html' %}
+    </div>
+    <div class="col-md-8">
+        {% for review in review_list %}
+        <div class="row card mb-4 mx-2">
+            <div class="card-body pt-2">
+                <span class="text-gradient text-primary text-xs font-weight-bold my-4"><i class="fas fa-star"></i>
+                    {{ review.rating }}</span>
+                <span href="javascript:;" class="card-title h5 d-block text-darker">
+                    {{ review.title }}
+                </span>
+                <p class="card-description mb-3">
+                    {{ review.comment }}
+                </p>
+                <div class="author align-items-center">
+                    <img src="{% static 'img/profile.jpg' %}" class="avatar shadow">
+                    <div class="name ps-3">
+                        <a href="{% url 'feed:user_profile' review.user.username %}"
+                            class="font-weight-bolder">{{ review.user.username }}</a>
+                        <div class="stats">
+                            <small>Posted on {{ review.updated_at }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

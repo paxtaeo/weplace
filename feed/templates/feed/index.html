@@ -1,6 +1,13 @@
-<h1>인기스타</h1>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+전체 회원 명단
 <ul>
-{% for celebrity in celebrity_list %}
-    <li><a href="{% url 'feed:user_profile' celebrity.username %}">{{ celebrity.username }}</a></li>
-{% endfor %}
+    {% for celebrity in celebrity_list %}
+        <li><a href="{% url 'feed:user_profile' celebrity.username %}">{{ celebrity.username }}</a></li>
+    {% endfor %}
 </ul>
+
+{% endblock %}

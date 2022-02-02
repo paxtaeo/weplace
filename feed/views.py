@@ -1,4 +1,6 @@
-from ast import Try
+import json
+
+from urllib import request
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -10,6 +12,7 @@ from django.conf import settings
 
 from accounts.models import User
 from .models import Place, Review
+from .forms import ReviewForm
 
 
 class Index(generic.ListView):
@@ -36,6 +39,30 @@ class UserProfile(generic.DetailView):
         return context
 
 
+def redirectToPlace(request):
+    data=json.loads(request.body)
+    id = data['id']
+    try:
+        place = Place.objects.get(id=id) 
+    except:
+        place = Place(
+            id=id,
+            place_name=data['place_name'],
+            place_url=data['place_url'],
+            phone=data['phone'],
+            category_name=data['category_name'],
+            category_group_name=data['category_group_name'],
+            category_group_code=data['category_group_code'],
+            address_name=data['address_name'],
+            road_address_name=data['road_address_name'],
+            x=data['x'],
+            y=data['y'],
+        )
+        place.save()
+    finally:
+        return redirect('feed:place_profile', id)
+
+
 class PlaceProfile(generic.DetailView):
     template_name = 'feed/place_profile.html'
     context_object_name = 'place'
@@ -55,20 +82,42 @@ class PlaceProfile(generic.DetailView):
         return context  
 
 
-class Explore(LoginRequiredMixin, generic.ListView):
-    template_name = 'feed/explore.html'
-    context_object_name = 'review_list'
+class WriteReview(LoginRequiredMixin, generic.edit.CreateView):
+    template_name = 'feed/review_form.html'
+
+    model = Review
+    form_class = ReviewForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['KAKAOMAP_API_KEY'] = settings.KAKAOMAP_API_KEY
-        return context  
+        context['place'] = get_object_or_404(Place, id=self.kwargs.get("id"))
+        return context
 
-    def get_queryset(self):
+    def form_valid(self, form):
+        form.instance.place = get_object_or_404(Place, id=self.kwargs.get("id"))
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class Explore(LoginRequiredMixin, generic.ListView):
+    def get_context_data(self, **kwargs):
         user = self.request.user
         following_list = user.following.all()
 
-        return Review.objects.filter(user__in=following_list).order_by('-updated_at')[:100]
+        context = super().get_context_data(**kwargs)
+        context['following_list'] = following_list
+        return context
+
+    def get_queryset(self):
+        return Review.objects.all()
+
+
+class ExploreMap(Explore):
+    template_name = 'feed/map.html'
+
+
+class ExploreTimeline(Explore):
+    template_name = 'feed/timeline.html'
 
 
 @login_required
@@ -80,38 +129,3 @@ def follow(request, username):
 def unfollow(request, username):
     request.user.unfollow(username)
     return redirect('feed:user_profile', username)
-
-
-class ReviewCreate(LoginRequiredMixin, generic.edit.CreateView):
-    template_name = 'feed/search.html'
-
-    model = Review
-    fields = ['rating', 'comment']
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['KAKAOMAP_API_KEY'] = settings.KAKAOMAP_API_KEY
-        return context  
-
-    def form_valid(self, form):
-        try:
-            place = Place.objects.get(id=self.request.POST['id']) 
-        except:
-            place = Place(
-                id=self.request.POST['id'],
-                place_name=self.request.POST['place_name'],
-                place_url=self.request.POST['place_url'],
-                phone=self.request.POST['phone'],
-                category_name=self.request.POST['category_name'],
-                category_group_name=self.request.POST['category_group_name'],
-                category_group_code=self.request.POST['category_group_code'],
-                address_name=self.request.POST['address_name'],
-                road_address_name=self.request.POST['road_address_name'],
-                x=self.request.POST['x'],
-                y=self.request.POST['y'],
-            )
-            place.save()
-        finally:
-            form.instance.place = place
-        form.instance.user = self.request.user
-        return super().form_valid(form)

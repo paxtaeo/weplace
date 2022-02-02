@@ -1,0 +1,57 @@
+<div class="card card-pricing min-vh-75 mb-4 mb-md-0 mx-2">
+    <div class="card-header bg-gradient-info text-center pt-4 pb-5 position-relative">
+    <div class="z-index-1 position-relative">
+        <h5 class="text-gradient text-primary font-weight-bold"><i class="fas fa-star"></i> {{ place.rating }}</h5>
+        <h1 class="text-white mt-2 mb-0">{{ place.place_name }}</h1>
+        <h6 class="text-white text-xs font-weight-normal">{{ place.category_name }}</h6>
+    </div>
+    </div>
+    <div class="position-relative mt-n5" style="height: 50px;">
+    <div class="position-absolute w-100">
+        <svg class="waves waves-sm" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 40" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+            <path id="card-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
+            </defs>
+            <g class="moving-waves">
+            <use xlink:href="#card-wave" x="48" y="-1" fill="rgba(255,255,255,0.30"></use>
+            <use xlink:href="#card-wave" x="48" y="3" fill="rgba(255,255,255,0.35)"></use>
+            <use xlink:href="#card-wave" x="48" y="5" fill="rgba(255,255,255,0.25)"></use>
+            <use xlink:href="#card-wave" x="48" y="8" fill="rgba(255,255,255,0.20)"></use>
+            <use xlink:href="#card-wave" x="48" y="13" fill="rgba(255,255,255,0.15)"></use>
+            <use xlink:href="#card-wave" x="48" y="16" fill="rgba(255,255,255,0.99)"></use>
+            </g>
+        </svg>
+        </div>
+    </div>
+    <div class="card-body text-center d-flex flex-column">
+    <ul class="list-unstyled max-width-200 mx-auto flex-fill d-flex flex-column justify-content-between py-6">
+        {% if place.address_name %}
+            <li>
+            {{ place.address_name }}
+            <hr class="horizontal dark">
+            </li>
+        {% endif %}
+        {% if place.place_url %}
+            <li>
+            <a href="{{ place.place_url }}"><i class="fas fa-link"></i>  웹페이지 방문하기</a>
+            <hr class="horizontal dark">
+            </li>
+        {% endif %}
+        {% if place.phone %}
+            <li>
+            <a href="tel:{{ place.phone }}"><i class="fas fa-phone"></i>  {{ place.phone }}</a>
+            <hr class="horizontal dark">
+            </li>
+        {% endif %}
+    </ul>
+    {% if 'write' not in request.path %}
+        <a href="{% url 'feed:write-review' place.id %}" class="btn btn-lg bg-gradient-info w-100 mb-0">
+            리뷰 쓰러가기
+        </a>
+    {% else %}
+        <button href="#" class="btn btn-lg bg-gradient-info w-100 mb-0" disabled>
+            리뷰를 쓰고 있어요!
+        </button>
+    {% endif %}
+    </div>
+</div>

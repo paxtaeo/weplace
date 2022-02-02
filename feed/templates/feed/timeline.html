@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="form-check form-switch ps-0">
+    <input class="form-check-input ms-auto" type="checkbox" id="onlyByFriendsCheckbox">
+    <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="onlyByFriendsCheckbox">친구들 리뷰만
+        보기</label>
+</div>
+
+<div class="row" id="timelineDiv">
+    <div class="col-md-4"></div>
+    <div class="col-md-4"></div>
+    <div class="col-md-4"></div>
+</div>
+
+
+<script type="text/javascript"
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAOMAP_API_KEY }}&libraries=services,clusterer"></script>
+<script>
+    function displayCard() {
+        const timelineDiv = document.getElementById("timelineDiv");
+        Array.from(timelineDiv.children).forEach((el, index) => {
+            while (el.firstChild) {
+                el.removeChild(el.lastChild);
+            }
+        })
+
+        var column = 0;
+        if (document.getElementById('onlyByFriendsCheckbox').checked) {
+            {% for review in object_list %}
+                {% if review.user in following_list %}
+                    timelineDiv.children[column % 3].innerHTML += `
+                        <div class="card card-profile card-plain">
+                            <div class="card-body bg-white shadow border-radius-lg p-3 mb-4">
+                                <span class="text-gradient text-primary text-xs font-weight-bold my-4"><i class="fas fa-star"></i>
+                                    {{ review.rating }}</span>
+                                <span href="javascript:;" class="card-title h5 d-block text-darker">
+                                    {{ review.title }}
+                                </span>
+                                <p class="card-description mb-3">
+                                    {{ review.comment }}
+                                </p>
+                                <div class="author align-items-center mb-4">
+                                    <img src="{% static 'img/profile.jpg' %}" class="avatar shadow">
+                                    <div class="name ps-3">
+                                        <a href="{% url 'feed:user_profile' review.user.username %}"
+                                            class="font-weight-bolder">{{ review.user.username }}</a>
+                                        <div class="stats">
+                                            <small>Posted on {{ review.updated_at }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'feed:place_profile' review.place.id %}" class="text-primary icon-move-right">
+                                    {{ review.place.place_name }} 리뷰 더 보러가기<i class="fas fa-arrow-right text-xs ms-1" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    column += 1;
+                {% endif %}
+            {% endfor %}
+        } else {
+            {% for review in object_list %}
+                    timelineDiv.children[column % 3].innerHTML += `
+                        <div class="card card-profile card-plain">
+                                <div class="card-body bg-white shadow border-radius-lg p-3 mb-4">
+                                    <span class="text-gradient text-primary text-xs font-weight-bold my-4"><i class="fas fa-star"></i>
+                                        {{ review.rating }}</span>
+                                    <span href="javascript:;" class="card-title h5 d-block text-darker">
+                                        {{ review.title }}
+                                    </span>
+                                    <p class="card-description mb-3">
+                                        {{ review.comment }}
+                                    </p>
+                                    <div class="author align-items-center mb-4">
+                                        <img src="{% static 'img/profile.jpg' %}" class="avatar shadow">
+                                        <div class="name ps-3">
+                                            <a href="{% url 'feed:user_profile' review.user.username %}"
+                                                class="font-weight-bolder">{{ review.user.username }}</a>
+                                            <div class="stats">
+                                                <small>Posted on {{ review.updated_at }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="{% url 'feed:place_profile' review.place.id %}" class="text-primary icon-move-right">
+                                        {{ review.place.place_name }} 리뷰 더 보러가기<i class="fas fa-arrow-right text-xs ms-1" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </div>
+                    `;
+                    column += 1;
+            {% endfor %}
+        }
+    }
+
+    displayCard();
+
+    document.getElementById('onlyByFriendsCheckbox').addEventListener('change', displayCard);
+</script>
+
+{% endblock %}

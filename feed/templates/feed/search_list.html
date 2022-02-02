@@ -1,0 +1,147 @@
+<form onsubmit="searchPlaces(); return false;">
+    <div class="input-group">
+        <div class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></div>
+        <input type="text" class="form-control" placeholder="Type here..." id="keyword">
+        <button class="btn btn-outline-secondary mb-0" type="submit">검색</button>
+    </div>
+</form>
+
+  <ul class="list-group py-3" id="placesList">
+  </ul>
+
+  <ul class="pagination justify-content-center" id="pagination"></ul>
+</nav>
+
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAOMAP_API_KEY }}&libraries=services"></script>
+<script>
+    // 장소 검색 객체를 생성합니다
+    var ps = new kakao.maps.services.Places();
+
+    // 키워드 검색을 요청하는 함수입니다
+    function searchPlaces() {
+        var keyword = document.getElementById('keyword').value;
+
+        if (!keyword.replace(/^\s+|\s+$/g, '')) {
+            alert('키워드를 입력해주세요!');
+            return false;
+        }
+
+        // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
+        ps.keywordSearch(keyword, placesSearchCB);
+    }
+
+    // 장소검색이 완료됐을 때 호출되는 콜백함수 입니다
+    function placesSearchCB(data, status, pagination) {
+        if (status === kakao.maps.services.Status.OK) {
+            // 정상적으로 검색이 완료됐으면
+            // 검색 목록과 마커를 표출합니다
+            displayPlaces(data);
+
+            // 페이지 번호를 표출합니다
+            displayPagination(pagination);
+        } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+            alert('검색 결과가 존재하지 않습니다.');
+            return;
+        } else if (status === kakao.maps.services.Status.ERROR) {
+            alert('검색 결과 중 오류가 발생했습니다.');
+            return;
+        }
+    }
+
+    // 검색 결과 목록과 마커를 표출하는 함수입니다
+    function displayPlaces(places) {
+        var listEl = document.getElementById('placesList'),
+            fragment = document.createDocumentFragment(),
+            listStr = '';
+
+        // 검색 결과 목록에 추가된 항목들을 제거합니다
+        removeAllChildNods(listEl);
+
+        for (var i = 0; i < places.length; i++) {
+            var itemEl = getListItem(i, places[i]);
+
+            (function (data) {
+                itemEl.onclick = function () {
+                    redirectToPlace(data);
+                };
+            })(places[i]);
+
+            fragment.appendChild(itemEl);
+        }
+
+        // 검색결과 항목들을 검색결과 목록 Element에 추가합니다
+        listEl.appendChild(fragment);
+    }
+
+    // 검색결과 항목을 Element로 반환하는 함수입니다
+    function getListItem(index, place) {
+        var el = document.createElement('li')
+        el.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center", "cursor-pointer");
+        el.innerHTML = `
+            <div>
+                <p class="text-xs font-weight-bold mb-0">`+place.place_name+`</p>
+                <p class="text-xs text-secondary mb-0">`+place.address_name+`</p>
+            </div>
+        `
+        return el;
+    }
+
+    // 검색결과 목록 하단에 페이지번호를 표시는 함수입니다
+    function displayPagination(pagination) {
+        var paginationEl = document.getElementById('pagination'),
+            fragment = document.createDocumentFragment(),
+            i;
+
+        // 기존에 추가된 페이지번호를 삭제합니다
+        while (paginationEl.hasChildNodes()) {
+            paginationEl.removeChild(paginationEl.lastChild);
+        }
+
+        for (i = 1; i <= pagination.last; i++) {
+            var listEl = document.createElement('li');
+            listEl.classList.add("page-item");
+
+            var aEl = document.createElement('a');
+            aEl.classList.add("page-link");
+            aEl.href = "#";
+            aEl.innerHTML = i;
+
+            if (i === pagination.current) {
+                listEl.classList.add("active");
+                aEl.classList.add("on");
+            } else {
+                aEl.onclick = (function (i) {
+                    return function () {
+                        pagination.gotoPage(i);
+                    }
+                })(i);
+            }
+            listEl.appendChild(aEl);
+            fragment.appendChild(listEl);
+        }
+        paginationEl.appendChild(fragment);
+    }
+
+    // 검색결과 목록의 자식 Element를 제거하는 함수입니다
+    function removeAllChildNods(el) {
+        while (el.hasChildNodes()) {
+            el.removeChild(el.lastChild);
+        }
+    }
+
+    function redirectToPlace(data) {
+        const csrftoken = Cookies.get('csrftoken');
+        const request = new Request(
+            "{% url 'feed:redirct-to-place' %}",
+            {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                mode: 'same-origin', // Do not send CSRF token to another domain.
+                body: JSON.stringify(data)
+            }
+        );
+        fetch(request).then(function(response) {
+            window.location.href = response.url
+        });
+    }
+</script>

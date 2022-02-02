@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 
 <div class="form-check form-switch ps-0">
     <input class="form-check-input ms-auto" type="checkbox" id="onlyByFriendsCheckbox">
-    <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="onlyByFriendsCheckbox">친구들 리뷰만
-        보기</label>
+    <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="onlyByFriendsCheckbox">친구들 리뷰만 보기</label>
 </div>
 
 <div class="row" id="timelineDiv">
@@ -48,7 +48,7 @@
                                         <a href="{% url 'feed:user_profile' review.user.username %}"
                                             class="font-weight-bolder">{{ review.user.username }}</a>
                                         <div class="stats">
-                                            <small>Posted on {{ review.updated_at }}</small>
+                                            <small>Posted on {{ review.updated_at|naturaltime }}</small>
                                         </div>
                                     </div>
                                 </div>
@@ -80,7 +80,7 @@
                                             <a href="{% url 'feed:user_profile' review.user.username %}"
                                                 class="font-weight-bolder">{{ review.user.username }}</a>
                                             <div class="stats">
-                                                <small>Posted on {{ review.updated_at }}</small>
+                                                <small>Posted on {{ review.updated_at|naturaltime }}</small>
                                             </div>
                                         </div>
                                     </div>

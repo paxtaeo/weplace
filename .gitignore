@@ -116,3 +116,5 @@ dmypy.json
 # .DS_Store
 .DS_Store
 secrets.json
+
+local_settings.py
